@@ -1,0 +1,22 @@
+{
+    "name": "t1mmen/opauth-freckle",
+    "description": "Opauth strategy for Freckle",
+    "keywords": ["authentication","auth","freckle", "opauth", "oauth", "timetracking"],
+    "homepage": "https://github.com/t1mmen/opauth-freckle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Timm Stokke",
+            "email": "timm@stokke.me"
+        }
+    ],
+    "require": {
+        "php": ">=5.2.0",
+        "opauth/opauth": ">=0.4.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "."
+        }
+    }
+}
