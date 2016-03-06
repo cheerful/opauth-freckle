@@ -42,7 +42,7 @@ class FreckleStrategy extends OpauthStrategy {
 	 * Auth request
 	 */
 	public function request() {
-		$url = 'https://www.freckle.com/oauth/authorize';
+		$url = 'https://secure.letsfreckle.com/oauth/2/authorize';
 		$params = array(
 			'response_type' => 'code',
 			'client_id' => $this->strategy['client_id'],
@@ -73,10 +73,19 @@ class FreckleStrategy extends OpauthStrategy {
 				'state' => md5('random-client-id'.$this->strategy['client_id'])
 			);
 
-			if (!empty($this->strategy['state'])) $params['state'] = $this->strategy['state'];
+			// if (!empty($this->strategy['state'])) $params['state'] = $this->strategy['state'];
+
+			debug($url);
+			debug($params);
+			// debug($headers);
 
 			$response = $this->serverPost($url, $params, null, $headers);
+			debug($response);
 			$results = json_decode($response,true);
+
+		debug($results);
+		debug($response);
+		exit;
 
 			if (!empty($results) && !empty($results['access_token'])) {
 
@@ -132,7 +141,7 @@ class FreckleStrategy extends OpauthStrategy {
 		$options['http']['header'] = "Content-Type: application/json";
 		$options['http']['header'] .= "\r\nAccept: application/json";
 		$options['http']['header'] .= "\r\nX-Access-Token: ".$access_token;
-		$options['http']['header'] .= "\r\nX-Client-ID: ".$this->strategy['client_id'];
+		// $options['http']['header'] .= "\r\nX-Client-ID: ".$this->strategy['client_id'];
 
 		$accountDetails = $this->serverGet('https://api.letsfreckle.com/v2/current_user/', array(), $options);
 
