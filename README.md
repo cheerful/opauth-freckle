@@ -41,7 +41,8 @@ Required parameters:
 <?php
 'Freckle' => array(
 	'client_id' => 'YOUR CLIENT ID',
-	'client_secret' => 'YOUR CLIENT SECRET'
+	'client_secret' => 'YOUR CLIENT SECRET',
+	'redirect_uri' => 'SAME AS YOUR FRECKLE OAUTH APP REDIRECT_URI'
 )
 ```
 
