@@ -26,7 +26,7 @@ Getting started
    Then run `composer install`.
 
 
-2. Create Freckle application at https://developer.freckle.com/apps/new
+2. Register a custom application from your Freckle account.
 
 3. Configure Opauth-Freckle strategy with at least `Client ID` and `Client Secret`.
 
