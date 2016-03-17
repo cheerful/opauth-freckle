@@ -46,8 +46,7 @@ class FreckleStrategy extends OpauthStrategy {
 		$params = array(
 			'response_type' => 'code',
 			'client_id' => $this->strategy['client_id'],
-			'redirect_uri' => $this->strategy['redirect_uri'],
-			'state' => md5('random-client-id'.$this->strategy['client_id'])
+			'redirect_uri' => $this->strategy['redirect_uri']
 		);
 
 		foreach ($this->optionals as $key) {
@@ -62,6 +61,7 @@ class FreckleStrategy extends OpauthStrategy {
 	 */
 	public function oauth2callback() {
 		if (array_key_exists('code', $_GET) && !empty($_GET['code'])) {
+
 			$code = $_GET['code'];
 			$url = 'https://secure.letsfreckle.com/oauth/2/access_token';
 
@@ -70,22 +70,11 @@ class FreckleStrategy extends OpauthStrategy {
 				'client_id' => $this->strategy['client_id'],
 				'client_secret' => $this->strategy['client_secret'],
 				'grant_type' => 'authorization_code',
-				'state' => md5('random-client-id'.$this->strategy['client_id'])
+				'redirect_uri' => $this->strategy['redirect_uri'],
 			);
 
-			// if (!empty($this->strategy['state'])) $params['state'] = $this->strategy['state'];
-
-			debug($url);
-			debug($params);
-			// debug($headers);
-
-			$response = $this->serverPost($url, $params, null, $headers);
-			debug($response);
-			$results = json_decode($response,true);
-
-		debug($results);
-		debug($response);
-		exit;
+			$response = $this->serverPost($url, $params, array(), $headers);
+			parse_str($response, $results);
 
 			if (!empty($results) && !empty($results['access_token'])) {
 
@@ -94,15 +83,19 @@ class FreckleStrategy extends OpauthStrategy {
 				$this->auth = array(
 					'uid' => $user['id'],
 					'info' => array(
-						'name' => $user['name'],
+						'first_name' => $user['first_name'],
+						'last_name' => $user['last_name'],
+						'name' => $user['first_name'].' '.$user['last_name'],
 						'email' => $user['email'],
+						'image' => $user['profile_image_url']
 					),
 					'credentials' => array(
-						'token' => $results['access_token']
+						'token' => $results['access_token'],
+						'refresh_token' => $results['refresh_token'],
+						'expires_in' => $results['expires_in'],
 					),
 					'raw' => $user
 				);
-
 
 				$this->callback();
 			}
@@ -140,20 +133,17 @@ class FreckleStrategy extends OpauthStrategy {
 
 		$options['http']['header'] = "Content-Type: application/json";
 		$options['http']['header'] .= "\r\nAccept: application/json";
-		$options['http']['header'] .= "\r\nX-Access-Token: ".$access_token;
-		// $options['http']['header'] .= "\r\nX-Client-ID: ".$this->strategy['client_id'];
 
-		$accountDetails = $this->serverGet('https://api.letsfreckle.com/v2/current_user/', array(), $options);
+		$accountDetails = $this->serverGet('https://api.letsfreckle.com/v2/current_user/', array('access_token' => $access_token), $options, $headers);
 
 		if (!empty($accountDetails)) {
 			return $this->recursiveGetObjectVars(json_decode($accountDetails,true));
-		}
-		else {
+		} else {
 			$error = array(
 				'code' => 'userinfo_error',
 				'message' => 'Failed when attempting to query Freckle API for user information',
 				'raw' => array(
-					'response' => $user,
+					'response' => $accountDetails,
 					'headers' => $headers
 				)
 			);
